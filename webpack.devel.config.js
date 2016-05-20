@@ -1,4 +1,6 @@
+var path = require('path');
 var webpack = require('webpack');
+var HtmlWebpackPlugin = require('html-webpack-plugin');
 var ExtractTextPlugin = require('extract-text-webpack-plugin');
 
 var bootstrapPath = __dirname + '/node_modules/bootstrap/dist/css';
@@ -12,24 +14,23 @@ module.exports = {
 
   // Set entry point to ./src/main and include necessary files for hot load
   entry:  [
-    "webpack-dev-server/client?http://localhost:9090",
-    "webpack/hot/only-dev-server",
-    "./app/app"
+    'webpack-hot-middleware/client?path=/__webpack_hmr&timeout=20000',
+    'react-hot-loader/patch',
+    path.join(__dirname, 'app/app.jsx')
   ],
 
   // This will not actually create a bundle.js file in ./build. It is used
   // by the dev server for dynamic hot loading.
   output: {
-    path: __dirname + "/build/",
+    path: path.join(__dirname, 'build'),
+    publicPath: "/",
     filename: "app.js",
-    publicPath: "http://localhost:9090/build/"
   },
 
   // Necessary plugins for hot load
   plugins: [
     new webpack.HotModuleReplacementPlugin(),
     new webpack.NoErrorsPlugin(),
-    new ExtractTextPlugin('style.css', { allChunks: true })
   ],
 
   // Transform source code using Babel and React Hot Loader
@@ -38,10 +39,7 @@ module.exports = {
       {
         test: /\.jsx?$/, // Only run `.js` and `.jsx` files through Babel
         exclude: /node_modules/,
-        loader: 'babel',
-        query: {
-          "presets": ["react", "es2015", "stage-0", "react-hmre"]
-        }
+        loader: 'babel?presets[]=react,presets[]=es2015,presets[]=stage-0'
       },
       { test: /\.css$/, loader: "style!css" },
       { test: /\.less$/, loader: 'style!css!less' },
